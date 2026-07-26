@@ -11,7 +11,7 @@ Pack(s) its steps call, declared in `requires`.
 | Field | Value |
 | --- | --- |
 | Identifier | `run.vineyard.skillpacks.account_pivot` |
-| Applies to | `identity.username`, `identity.email_address`, `identity.person` |
+| Applies to | `identity.handle`, `identity.user_account`, `identity.email_address`, `identity.person` |
 | Requires | `run.vineyard.pluginpacks.whatsmyname` |
 | Sections | `handles` — spreading from one username across platforms · `corroborate` — what actually ties two accounts to one person |
 

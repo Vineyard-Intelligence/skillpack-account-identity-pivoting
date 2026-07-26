@@ -5,7 +5,7 @@
   "description": "Turn one account or handle into the person's other accounts, and know when a shared username is NOT the same person.",
   "author": "vineyard-run",
   "version": "1.0.0",
-  "applies_to": ["identity.username", "identity.email_address", "identity.person"],
+  "applies_to": ["identity.handle", "identity.user_account", "identity.email_address", "identity.person"],
   "triggers": ["account", "username", "handle", "same person", "sock puppet", "계정", "핸들"],
   "requires": ["run.vineyard.pluginpacks.whatsmyname"],
   "overview": "Account & identity pivoting — from one handle or email to the accounts behind the same person, without over-merging strangers who happen to share a name.\n\nUse this when the analyst has a username, email, or profile and wants \"where else is this person\". Load a section:\n  - \"handles\"  — spreading from one username across platforms\n  - \"corroborate\" — what actually ties two accounts to ONE person (and what doesn't)\n\nRead \"corroborate\" first: the whole risk here is collapsing two people into one node.",
