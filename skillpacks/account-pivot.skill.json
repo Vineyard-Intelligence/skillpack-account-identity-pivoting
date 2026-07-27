@@ -4,7 +4,7 @@
   "name": "Account & identity pivoting",
   "description": "Turn one account or handle into the person's other accounts, and know when a shared username is NOT the same person.",
   "author": "vineyard-run",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "applies_to": [
     "identity.handle",
     "identity.user_account",
@@ -40,6 +40,7 @@
     {
       "id": "deep-dive-handle",
       "label": "Deep-dive one handle",
+      "category": "Find accounts",
       "summary": "Spread a single username across platforms, then work out which hits are the same person.",
       "prompt": "I want to deep dive on the user account \"{{handle}}\".\nFor your information: {{context}}.\nEnumerate where the handle exists, then use the \"corroborate\" section to separate the accounts that are genuinely one owner from the ones that merely share a name. Tell me which is which, and say plainly where you are guessing.",
       "variables": [
@@ -58,8 +59,74 @@
       ]
     },
     {
+      "id": "from-email",
+      "label": "Start from an email address",
+      "category": "Find accounts",
+      "summary": "Turn an address into the handles and accounts behind it.",
+      "prompt": "Start from the email address {{email}}.\nDerive the handles worth checking from it, find the accounts, and keep each one a candidate until something corroborates a single owner.",
+      "variables": [
+        {
+          "key": "email",
+          "label": "Email address",
+          "placeholder": "example@example.com",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "from-profile",
+      "label": "Start from a profile page",
+      "category": "Find accounts",
+      "summary": "Mine one profile for the handle, display name, bio and links, then spread from those.",
+      "prompt": "Start from this profile: {{url}}.\nPull out what identifies the owner — handle, display name, bio text, linked sites, avatar — and use each as its own pivot. Record where every detail came from, and treat the accounts you reach as candidates rather than the same person.",
+      "variables": [
+        {
+          "key": "url",
+          "label": "Profile URL",
+          "placeholder": "https://example.com/@example",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "handle-variants",
+      "label": "Try variants of a handle",
+      "category": "Find accounts",
+      "summary": "For when the obvious spelling is taken, abandoned, or too common to be useful.",
+      "prompt": "The handle {{handle}} is probably one of several the same person uses.\nWork out the plausible variants — separators, trailing numbers, initial-plus-surname forms, a transliteration of {{native}} — and check those as well as the original.\nList every variant you tried, including the dead ends, so I do not repeat them.",
+      "variables": [
+        {
+          "key": "handle",
+          "label": "Base handle",
+          "placeholder": "example",
+          "required": true
+        },
+        {
+          "key": "native",
+          "label": "Name in another script (optional)",
+          "placeholder": "김예시"
+        }
+      ]
+    },
+    {
+      "id": "expand-person",
+      "label": "Expand a person already in the case",
+      "category": "Find accounts",
+      "summary": "Use what the graph already holds about someone as the starting set.",
+      "prompt": "Take the person {{person}} as they already exist in this case.\nRead the accounts, handles and addresses already attached to them, use each as a pivot, and look for accounts the case has not reached yet. Do not re-stage what is already here — extend it, and say what is new.",
+      "variables": [
+        {
+          "key": "person",
+          "label": "Person node",
+          "placeholder": "the account holder in this case",
+          "required": true
+        }
+      ]
+    },
+    {
       "id": "same-person",
       "label": "Are these the same person?",
+      "category": "Corroborate",
       "summary": "Test a suspected link between two accounts before it becomes an edge.",
       "prompt": "Decide whether \"{{a}}\" and \"{{b}}\" belong to the same person.\nRead the \"corroborate\" section first. Tell me what evidence would actually settle it, what you can find, and what is only a shared handle — and do not draw a \"same person\" edge on a common username alone.",
       "variables": [
@@ -78,18 +145,79 @@
       ]
     },
     {
-      "id": "from-email",
-      "label": "Start from an email",
-      "summary": "Turn an address into the accounts and handles behind it.",
-      "prompt": "Start from the email address {{email}}.\nDerive the handles worth checking from it, find the accounts, and keep each one a candidate until something corroborates a single owner.",
+      "id": "triage-candidates",
+      "label": "Sort candidates by how well they hold up",
+      "category": "Corroborate",
+      "summary": "A pile of hits from an enumeration run, separated into corroborated, unproven, and ruled out.",
+      "prompt": "These are candidate accounts for one person: {{candidates}}.\nSort them into three groups — corroborated as the same owner, plausible but unproven, and ruled out — and for every one name the specific evidence that put it there. Where a group is large, tell me which single check would move the most of them.",
       "variables": [
         {
-          "key": "email",
-          "label": "Email address",
-          "placeholder": "example@example.com",
+          "key": "candidates",
+          "label": "Candidate accounts",
+          "placeholder": "one per line, or \"everything staged in this case\"",
+          "required": true,
+          "multiline": true
+        }
+      ]
+    },
+    {
+      "id": "sock-puppet-set",
+      "label": "Test a suspected sock-puppet set",
+      "category": "Corroborate",
+      "summary": "Several accounts, one suspected operator — what actually ties them together?",
+      "prompt": "These accounts are suspected to be operated by one person: {{accounts}}.\nLook for what would actually establish common control — shared recovery details, cross-links, reused rare text or avatars, account creation patterns. Report per pair, not for the set as a whole, because one strong pair does not make the rest of the set real.",
+      "variables": [
+        {
+          "key": "accounts",
+          "label": "Suspected accounts",
+          "placeholder": "one per line",
+          "required": true,
+          "multiline": true
+        }
+      ]
+    },
+    {
+      "id": "rule-out",
+      "label": "Rule out a false match",
+      "category": "Corroborate",
+      "summary": "Deliberately try to break a link the case is leaning on.",
+      "prompt": "I suspect {{a}} and {{b}} are NOT the same person, despite what they appear to share.\nArgue that case as strongly as the evidence allows: how common is the shared attribute, and what would you expect to see if they really were one person that is absent here? Then argue the other side, and tell me which is better supported.",
+      "variables": [
+        {
+          "key": "a",
+          "label": "First account",
+          "placeholder": "@example on GitHub",
+          "required": true
+        },
+        {
+          "key": "b",
+          "label": "Second account",
+          "placeholder": "@example on Telegram",
           "required": true
         }
       ]
+    },
+    {
+      "id": "writeup",
+      "label": "Summarise what the case establishes",
+      "category": "Report",
+      "summary": "Corroborated, candidate and ruled out — each conclusion tied to the evidence it rests on.",
+      "prompt": "Summarise what this case now establishes about {{subject}}.\nSeparate what is corroborated from what is still a candidate and what has been ruled out, and tie every conclusion to the node or edge it rests on. Where a conclusion rests on one piece of evidence, say so — that is the part most likely to be wrong.",
+      "variables": [
+        {
+          "key": "subject",
+          "label": "Who or what the summary is about",
+          "placeholder": "the handle \"example\"",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "gaps",
+      "label": "What would settle the open questions?",
+      "category": "Report",
+      "summary": "Turn the unresolved parts of the case into a list of specific next checks.",
+      "prompt": "Go over what is unresolved in this case and turn it into next steps.\nFor each open question, name the specific evidence that would settle it and the check that would produce that evidence. Put the ones this project's installed plugins can actually answer first, and say plainly which ones nothing here can reach."
     }
   ]
 }
