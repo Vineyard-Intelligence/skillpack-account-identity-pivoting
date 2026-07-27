@@ -4,10 +4,25 @@
   "name": "Account & identity pivoting",
   "description": "Turn one account or handle into the person's other accounts, and know when a shared username is NOT the same person.",
   "author": "vineyard-run",
-  "version": "1.0.0",
-  "applies_to": ["identity.handle", "identity.user_account", "identity.email_address", "identity.person"],
-  "triggers": ["account", "username", "handle", "same person", "sock puppet", "계정", "핸들"],
-  "requires": ["run.vineyard.pluginpacks.whatsmyname"],
+  "version": "1.1.0",
+  "applies_to": [
+    "identity.handle",
+    "identity.user_account",
+    "identity.email_address",
+    "identity.person"
+  ],
+  "triggers": [
+    "account",
+    "username",
+    "handle",
+    "same person",
+    "sock puppet",
+    "계정",
+    "핸들"
+  ],
+  "requires": [
+    "run.vineyard.pluginpacks.whatsmyname"
+  ],
   "overview": "Account & identity pivoting — from one handle or email to the accounts behind the same person, without over-merging strangers who happen to share a name.\n\nUse this when the analyst has a username, email, or profile and wants \"where else is this person\". Load a section:\n  - \"handles\"  — spreading from one username across platforms\n  - \"corroborate\" — what actually ties two accounts to ONE person (and what doesn't)\n\nRead \"corroborate\" first: the whole risk here is collapsing two people into one node.",
   "sections": [
     {
@@ -19,6 +34,62 @@
       "id": "corroborate",
       "summary": "What actually ties two accounts to one person — and what doesn't.",
       "body": "Same username is a LEAD, not proof of one person. Corroborate before drawing a \"same person\" / \"controls\" edge:\n\nStrong: a shared verified email or phone; one account linking to the other; identical rare bio text / avatar hash reused; a password-reset or profile field that ties them.\nWeak / not proof: the same common handle; the same city; following each other; similar posting times.\n\nWhen you have real corroboration, stage the link with a label for the EVIDENCE (\"shares recovery email\", \"cross-links to\"), not the conclusion (\"is\"). When you do not, say the accounts are candidates for the same person and hand the judgement to the analyst — do not assert identity from a shared handle. Every node and edge is staged for their review; a wrong merge is the most damaging thing you can propose here."
+    }
+  ],
+  "starters": [
+    {
+      "id": "deep-dive-handle",
+      "label": "Deep-dive one handle",
+      "summary": "Spread a single username across platforms, then work out which hits are the same person.",
+      "prompt": "I want to deep dive on the user account \"{{handle}}\".\nFor your information: {{context}}.\nEnumerate where the handle exists, then use the \"corroborate\" section to separate the accounts that are genuinely one owner from the ones that merely share a name. Tell me which is which, and say plainly where you are guessing.",
+      "variables": [
+        {
+          "key": "handle",
+          "label": "Handle or username",
+          "placeholder": "example",
+          "required": true
+        },
+        {
+          "key": "context",
+          "label": "What you already know (optional)",
+          "placeholder": "looks South Korean, software developer",
+          "multiline": true
+        }
+      ]
+    },
+    {
+      "id": "same-person",
+      "label": "Are these the same person?",
+      "summary": "Test a suspected link between two accounts before it becomes an edge.",
+      "prompt": "Decide whether \"{{a}}\" and \"{{b}}\" belong to the same person.\nRead the \"corroborate\" section first. Tell me what evidence would actually settle it, what you can find, and what is only a shared handle — and do not draw a \"same person\" edge on a common username alone.",
+      "variables": [
+        {
+          "key": "a",
+          "label": "First account",
+          "placeholder": "@example on GitHub",
+          "required": true
+        },
+        {
+          "key": "b",
+          "label": "Second account",
+          "placeholder": "@example on Telegram",
+          "required": true
+        }
+      ]
+    },
+    {
+      "id": "from-email",
+      "label": "Start from an email",
+      "summary": "Turn an address into the accounts and handles behind it.",
+      "prompt": "Start from the email address {{email}}.\nDerive the handles worth checking from it, find the accounts, and keep each one a candidate until something corroborates a single owner.",
+      "variables": [
+        {
+          "key": "email",
+          "label": "Email address",
+          "placeholder": "example@example.com",
+          "required": true
+        }
+      ]
     }
   ]
 }
