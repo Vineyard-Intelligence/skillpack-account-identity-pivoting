@@ -4,7 +4,7 @@
   "name": "Account & identity pivoting",
   "description": "Turn one account or handle into the person's other accounts, and know when a shared username is NOT the same person.",
   "author": "vineyard-run",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "applies_to": [
     "identity.handle",
     "identity.user_account",
@@ -28,7 +28,7 @@
     {
       "id": "handles",
       "summary": "Spreading from one username across platforms.",
-      "body": "From a USERNAME:\n- Run the account-search plugin (WhatsMyName) to enumerate the handle across ~700 sites. Each hit is a CANDIDATE account node — not yet the same person.\n- Look for the handle reused in email local-parts, vanity URLs, and display names.\n- A rare, distinctive handle reused verbatim is a strong lead; a common word as a handle is weak (many unrelated people pick it).\n\nModel each found account as its own node with its own platform — never collapse \"@alice on GitHub\" and \"@alice on Telegram\" into one username node. They share a username and are different accounts until something corroborates one owner (see \"corroborate\"). Stage a node per account and hold the \"same person\" edge until you have that evidence."
+      "body": "From a USERNAME:\n- Run the account-search plugin (WhatsMyName) to enumerate the handle across ~700 sites. Each hit is a CANDIDATE account node — not yet the same person.\n- Look for the handle reused in email local-parts, vanity URLs, and display names.\n- A rare, distinctive handle reused verbatim is a strong lead; a common word as a handle is weak (many unrelated people pick it).\n\nModel each found account as its own node with its own platform — never collapse \"@alice on GitHub\" and \"@alice on Telegram\" into one username node. They share a username and are different accounts until something corroborates one owner (see \"corroborate\"). Stage a node per account and hold the \"same person\" edge until you have that evidence.\n\nDo not stop at one pass. An account WhatsMyName finds often carries its own new leads — an email in a bio, a linked site, a handle variant used elsewhere — and those are worth feeding back through this same section rather than treating the sweep as finished. Keep going while a new lead is still turning up accounts nobody has checked yet; stop once a pass adds nothing new, and say so."
     },
     {
       "id": "corroborate",
