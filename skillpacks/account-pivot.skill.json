@@ -4,10 +4,10 @@
   "name": "Account & identity pivoting",
   "description": "Turn one account or handle into the person's other accounts, and know when a shared username is NOT the same person.",
   "author": "vineyard-run",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "applies_to": [
     "identity.handle",
-    "identity.user_account",
+    "identity.account",
     "identity.email_address",
     "identity.person"
   ],
