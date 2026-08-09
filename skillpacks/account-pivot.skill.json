@@ -4,7 +4,7 @@
   "name": "Account & identity pivoting",
   "description": "Turn one account or handle into the person's other accounts, and know when a shared username is NOT the same person.",
   "author": "vineyard-run",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "applies_to": [
     "identity.handle",
     "identity.account",
@@ -15,25 +15,30 @@
     "account",
     "username",
     "handle",
+    "email",
     "same person",
     "sock puppet",
+    "persona",
     "계정",
-    "핸들"
+    "핸들",
+    "아이디",
+    "동일인",
+    "부계정"
   ],
   "requires": [
     "run.vineyard.pluginpacks.whatsmyname"
   ],
-  "overview": "Account & identity pivoting — from one handle or email to the accounts behind the same person, without over-merging strangers who happen to share a name.\n\nUse this when the analyst has a username, email, or profile and wants \"where else is this person\". Load a section:\n  - \"handles\"  — spreading from one username across platforms\n  - \"corroborate\" — what actually ties two accounts to ONE person (and what doesn't)\n\nRead \"corroborate\" first: the whole risk here is collapsing two people into one node.",
+  "overview": "Account & identity pivoting — from one handle or email to the accounts behind the same person,\nwithout over-merging strangers who happen to share a name.\n\nUse this when the analyst has a username, email, or profile and wants \"where else is this person\".\nLoad a section:\n  - \"handles\"     - spreading from one username across platforms\n  - \"corroborate\" - what actually ties two accounts to ONE person (and what doesn't)\n\nRead \"corroborate\" first: the whole risk here is collapsing two people into one node. A wrong merge\nis the most damaging thing this pack can produce — it is not a missing fact, it is a false one, and\nit survives into every conclusion drawn afterwards.\n\nTHREE RULES THAT APPLY TO BOTH SECTIONS, so they are not repeated in each:\n\n1. BUDGET. Keep sweeping while a pass still turns up accounts nobody has checked; stop when a pass\n   adds nothing new, and say so. If a handle is common enough that enumeration returns dozens of\n   unrelated hits, stop and say THAT — a long list of strangers is not progress.\n\n2. PLUGINS, NOT MEMORY. Match the node's type against the `consumes` list from list_plugins and call\n   the plugin that covers the hop. Never assert that an account exists, or that a handle is taken,\n   from your own knowledge — a plausible profile URL you recalled is indistinguishable, on the\n   canvas, from one a tool returned.\n\n3. REPORT IN FOUR PARTS, always in this order: corroborated as one owner, with the evidence; still a\n   candidate, and what would settle it; ruled out, and why; what nothing installed here can reach.\n\nHANDING OFF: when a lead turns into infrastructure — a personal domain, a mail server, an IP in a\nheader — that is where this pack ends and \"Infrastructure pivoting\" begins.",
   "sections": [
     {
       "id": "handles",
       "summary": "Spreading from one username across platforms.",
-      "body": "From a USERNAME:\n- Run the account-search plugin (WhatsMyName) to enumerate the handle across ~700 sites. Each hit is a CANDIDATE account node — not yet the same person.\n- Look for the handle reused in email local-parts, vanity URLs, and display names.\n- A rare, distinctive handle reused verbatim is a strong lead; a common word as a handle is weak (many unrelated people pick it).\n\nModel each found account as its own node with its own platform — never collapse \"@alice on GitHub\" and \"@alice on Telegram\" into one username node. They share a username and are different accounts until something corroborates one owner (see \"corroborate\"). Stage a node per account and hold the \"same person\" edge until you have that evidence.\n\nDo not stop at one pass. An account WhatsMyName finds often carries its own new leads — an email in a bio, a linked site, a handle variant used elsewhere — and those are worth feeding back through this same section rather than treating the sweep as finished. Keep going while a new lead is still turning up accounts nobody has checked yet; stop once a pass adds nothing new, and say so."
+      "body": "From a USERNAME:\n- Run the account-search plugin (WhatsMyName) to enumerate the handle across ~700 sites. Each hit is\n  a CANDIDATE account node — not yet the same person.\n- Look for the handle reused in email local-parts, vanity URLs, and display names.\n- Try the variants a person actually uses: separators (dev.kim / dev_kim / devkim), trailing digits,\n  an initial-plus-surname form, and a transliteration if the subject writes in another script. List\n  the variants you tried INCLUDING the dead ends, so nobody repeats them.\n\nDISTINCTIVENESS DECIDES WHAT A HIT IS WORTH — judge it BEFORE the sweep, not after:\n  distinctive — a coined word, an unusual compound, a rare spelling. Reuse verbatim is a strong lead.\n  common      — a dictionary word, a first name, a short string, a franchise reference. Reuse means\n                nothing on its own, and a 700-site sweep will return mostly strangers.\nIf the handle is common, say so up front and expect the sweep to produce candidates, not answers.\n\nMODEL EACH ACCOUNT SEPARATELY. Never collapse \"@alice on GitHub\" and \"@alice on Telegram\" into one\nnode. They share a username and are different accounts until something corroborates one owner. Stage\na node per account, with its platform, and hold the \"same person\" edge until you have that evidence.\n\nFEED BACK IN. An account the sweep finds carries its own new leads — an email in a bio, a linked\nsite, a handle variant used elsewhere — and those go through this section again rather than being\ntreated as the end of the sweep. Stop when a pass adds nothing new, and say so."
     },
     {
       "id": "corroborate",
       "summary": "What actually ties two accounts to one person — and what doesn't.",
-      "body": "Same username is a LEAD, not proof of one person. Corroborate before drawing a \"same person\" / \"controls\" edge:\n\nStrong: a shared verified email or phone; one account linking to the other; identical rare bio text / avatar hash reused; a password-reset or profile field that ties them.\nWeak / not proof: the same common handle; the same city; following each other; similar posting times.\n\nWhen you have real corroboration, stage the link with a label for the EVIDENCE (\"shares recovery email\", \"cross-links to\"), not the conclusion (\"is\"). When you do not, say the accounts are candidates for the same person and hand the judgement to the analyst — do not assert identity from a shared handle. Every node and edge is staged for their review; a wrong merge is the most damaging thing you can propose here."
+      "body": "Same username is a LEAD, not proof of one person.\n\nTHE THRESHOLD, and it is a counting rule so that it is applied the same way twice:\n\n  STRONG (any ONE is enough to stage a \"same person\" link)\n    - a shared VERIFIED email address or phone number\n    - one account links to the other from its own profile\n    - identical rare bio text, or the same avatar by hash\n    - a password-reset or profile field that names the other account\n\n  WEAK (THREE from different rows, or it stays a candidate)\n    - the same handle, where the handle is distinctive rather than a dictionary word\n    - the same display name or real name\n    - the same city, employer, or school\n    - overlapping posting hours or language\n    - following each other, or a shared follower cluster\n\n  NEITHER, at any quantity\n    - the same COMMON handle. Fifty strangers are \"alex\" on fifty platforms.\n    - the same avatar where it is a default, a stock image, or a popular meme\n    - the same provider (both on Gmail, both on Telegram)\n\nBelow the threshold, stage the account node and NO edge, and say in one line what would settle it.\n\nLABEL FOR THE EVIDENCE, NOT THE CONCLUSION: \"shares recovery email\", \"cross-links to\", \"reuses\navatar\" — never \"is\".\n\nWORKED EXAMPLE — the mistake this section exists to prevent:\n\n  @dev_kim on GitHub and @dev_kim on Telegram. Both bios say \"Seoul\". Both were created in 2021.\n  WRONG: a \"same person\" edge. That is one weak signal (the handle, and \"kim\" is among the most\n         common surnames in Korea), plus a city shared by ten million people, plus a coincidence.\n  RIGHT: two account nodes, no edge, and: \"candidates — same handle and city. What would settle it:\n         a shared email on either profile, a cross-link, or the GitHub account's commit email.\"\n\nEvery node and edge is staged for the analyst's review. Reviewing an unproposed link costs nothing;\nun-drawing a wrong one costs the analyst their confidence in everything else you staged."
     }
   ],
   "starters": [
@@ -42,7 +47,7 @@
       "label": "Deep-dive one handle",
       "category": "Find accounts",
       "summary": "Spread a single username across platforms, then work out which hits are the same person.",
-      "prompt": "I want to deep dive on the user account \"{{handle}}\".\nFor your information: {{context}}.\nEnumerate where the handle exists, then use the \"corroborate\" section to separate the accounts that are genuinely one owner from the ones that merely share a name. Tell me which is which, and say plainly where you are guessing.",
+      "prompt": "I want to deep dive on the user account \"{{handle}}\".\nFor your information: {{context}}.\nEnumerate where the handle exists, then use the \"corroborate\" section to separate the accounts that are genuinely one owner from the ones that merely share a name. Tell me which is which, and say plainly where you are guessing.\nReport in the four parts the overview names.",
       "variables": [
         {
           "key": "handle",
@@ -63,7 +68,7 @@
       "label": "Start from an email address",
       "category": "Find accounts",
       "summary": "Turn an address into the handles and accounts behind it.",
-      "prompt": "Start from the email address {{email}}.\nDerive the handles worth checking from it, find the accounts, and keep each one a candidate until something corroborates a single owner.",
+      "prompt": "Start from the email address {{email}}.\nDerive the handles worth checking from it, find the accounts, and keep each one a candidate until something corroborates a single owner.\nRead \"handles\", then \"corroborate\".",
       "variables": [
         {
           "key": "email",
@@ -78,7 +83,7 @@
       "label": "Start from a profile page",
       "category": "Find accounts",
       "summary": "Mine one profile for the handle, display name, bio and links, then spread from those.",
-      "prompt": "Start from this profile: {{url}}.\nPull out what identifies the owner — handle, display name, bio text, linked sites, avatar — and use each as its own pivot. Record where every detail came from, and treat the accounts you reach as candidates rather than the same person.",
+      "prompt": "Start from this profile: {{url}}.\nPull out what identifies the owner — handle, display name, bio text, linked sites, avatar — and use each as its own pivot. Record where every detail came from, and treat the accounts you reach as candidates rather than the same person.\nRead \"handles\", then \"corroborate\".",
       "variables": [
         {
           "key": "url",
@@ -93,7 +98,7 @@
       "label": "Try variants of a handle",
       "category": "Find accounts",
       "summary": "For when the obvious spelling is taken, abandoned, or too common to be useful.",
-      "prompt": "The handle {{handle}} is probably one of several the same person uses.\nWork out the plausible variants — separators, trailing numbers, initial-plus-surname forms, a transliteration of {{native}} — and check those as well as the original.\nList every variant you tried, including the dead ends, so I do not repeat them.",
+      "prompt": "The handle {{handle}} is probably one of several the same person uses.\nWork out the plausible variants — separators, trailing numbers, initial-plus-surname forms, a transliteration of {{native}} — and check those as well as the original.\nList every variant you tried, including the dead ends, so I do not repeat them.\nRead \"handles\" — judge the handle's distinctiveness before the sweep.",
       "variables": [
         {
           "key": "handle",
@@ -113,7 +118,7 @@
       "label": "Expand a person already in the case",
       "category": "Find accounts",
       "summary": "Use what the graph already holds about someone as the starting set.",
-      "prompt": "Take the person {{person}} as they already exist in this case.\nRead the accounts, handles and addresses already attached to them, use each as a pivot, and look for accounts the case has not reached yet. Do not re-stage what is already here — extend it, and say what is new.",
+      "prompt": "Take the person {{person}} as they already exist in this case.\nRead the accounts, handles and addresses already attached to them, use each as a pivot, and look for accounts the case has not reached yet. Do not re-stage what is already here — extend it, and say what is new.\nRead \"corroborate\" before extending anything.",
       "variables": [
         {
           "key": "person",
@@ -128,7 +133,7 @@
       "label": "Are these the same person?",
       "category": "Corroborate",
       "summary": "Test a suspected link between two accounts before it becomes an edge.",
-      "prompt": "Decide whether \"{{a}}\" and \"{{b}}\" belong to the same person.\nRead the \"corroborate\" section first. Tell me what evidence would actually settle it, what you can find, and what is only a shared handle — and do not draw a \"same person\" edge on a common username alone.",
+      "prompt": "Decide whether \"{{a}}\" and \"{{b}}\" belong to the same person.\nRead the \"corroborate\" section first. Tell me what evidence would actually settle it, what you can find, and what is only a shared handle — and do not draw a \"same person\" edge on a common username alone.\nApply its counting rule explicitly: name each signal you found, mark it strong or weak, and state the total — I want to see the arithmetic, not just the verdict.",
       "variables": [
         {
           "key": "a",
@@ -149,7 +154,7 @@
       "label": "Sort candidates by how well they hold up",
       "category": "Corroborate",
       "summary": "A pile of hits from an enumeration run, separated into corroborated, unproven, and ruled out.",
-      "prompt": "These are candidate accounts for one person: {{candidates}}.\nSort them into three groups — corroborated as the same owner, plausible but unproven, and ruled out — and for every one name the specific evidence that put it there. Where a group is large, tell me which single check would move the most of them.",
+      "prompt": "These are candidate accounts for one person: {{candidates}}.\nSort them into three groups — corroborated as the same owner, plausible but unproven, and ruled out — and for every one name the specific evidence that put it there. Where a group is large, tell me which single check would move the most of them.\nRead \"corroborate\" and sort by its threshold.",
       "variables": [
         {
           "key": "candidates",
@@ -165,7 +170,7 @@
       "label": "Test a suspected sock-puppet set",
       "category": "Corroborate",
       "summary": "Several accounts, one suspected operator — what actually ties them together?",
-      "prompt": "These accounts are suspected to be operated by one person: {{accounts}}.\nLook for what would actually establish common control — shared recovery details, cross-links, reused rare text or avatars, account creation patterns. Report per pair, not for the set as a whole, because one strong pair does not make the rest of the set real.",
+      "prompt": "These accounts are suspected to be operated by one person: {{accounts}}.\nLook for what would actually establish common control — shared recovery details, cross-links, reused rare text or avatars, account creation patterns. Report per pair, not for the set as a whole, because one strong pair does not make the rest of the set real.\nRead \"corroborate\" and apply the threshold per PAIR.",
       "variables": [
         {
           "key": "accounts",
@@ -181,7 +186,7 @@
       "label": "Rule out a false match",
       "category": "Corroborate",
       "summary": "Deliberately try to break a link the case is leaning on.",
-      "prompt": "I suspect {{a}} and {{b}} are NOT the same person, despite what they appear to share.\nArgue that case as strongly as the evidence allows: how common is the shared attribute, and what would you expect to see if they really were one person that is absent here? Then argue the other side, and tell me which is better supported.",
+      "prompt": "I suspect {{a}} and {{b}} are NOT the same person, despite what they appear to share.\nArgue that case as strongly as the evidence allows: how common is the shared attribute, and what would you expect to see if they really were one person that is absent here? Then argue the other side, and tell me which is better supported.\nRead \"corroborate\".",
       "variables": [
         {
           "key": "a",
@@ -202,7 +207,7 @@
       "label": "Summarise what the case establishes",
       "category": "Report",
       "summary": "Corroborated, candidate and ruled out — each conclusion tied to the evidence it rests on.",
-      "prompt": "Summarise what this case now establishes about {{subject}}.\nSeparate what is corroborated from what is still a candidate and what has been ruled out, and tie every conclusion to the node or edge it rests on. Where a conclusion rests on one piece of evidence, say so — that is the part most likely to be wrong.",
+      "prompt": "Summarise what this case now establishes about {{subject}}.\nSeparate what is corroborated from what is still a candidate and what has been ruled out, and tie every conclusion to the node or edge it rests on. Where a conclusion rests on one piece of evidence, say so — that is the part most likely to be wrong.\nReport in the four parts the overview names.",
       "variables": [
         {
           "key": "subject",
@@ -217,7 +222,7 @@
       "label": "What would settle the open questions?",
       "category": "Report",
       "summary": "Turn the unresolved parts of the case into a list of specific next checks.",
-      "prompt": "Go over what is unresolved in this case and turn it into next steps.\nFor each open question, name the specific evidence that would settle it and the check that would produce that evidence. Put the ones this project's installed plugins can actually answer first, and say plainly which ones nothing here can reach."
+      "prompt": "Go over what is unresolved in this case and turn it into next steps.\nFor each open question, name the specific evidence that would settle it and the check that would produce that evidence. Put the ones this project's installed plugins can actually answer first, and say plainly which ones nothing here can reach.\nReport in the four parts the overview names."
     }
   ]
 }
