@@ -4,8 +4,8 @@ The **Account & identity pivoting** Skill Pack for Vineyard — a text investiga
 agent can consult when turning one account or handle into the person's other accounts, without
 over-merging strangers who happen to share a username.
 
-A Skill Pack runs no code and requests no permissions of its own; it is guidance the agent follows,
-surfaced to it through the `list_skills` / `load_skill` tools. Its only dependency is the Plugin
+A Skill Pack runs no code and requests no permissions of its own; it is guidance the agent follows.
+Its only dependency is the Plugin
 Pack(s) its steps call, declared in `requires`.
 
 | Field | Value |
@@ -17,24 +17,17 @@ Pack(s) its steps call, declared in `requires`.
 
 ## How it decides that two accounts are one person
 
-Not by counting signals. A threshold like "three weak signals or it stays a candidate" scores
-`trustno1` and `imkjd39` identically, when one is a leaked-password staple worn by tens of thousands
-and the other is effectively unique — and the pack's own advice elsewhere, and the agent's base
-instructions, both say a shared attribute is worth only what its rarity is worth.
+Not by counting signals — a shared attribute is worth only what its rarity is worth.
 
-So `corroborate` asks for one estimate instead: **if these were two unrelated people, how likely is
-everything you are looking at?** The agent judges the crowd behind each attribute from what it knows
-about the world, names what the judgement rests on so the analyst can dispute it in two seconds, and
-measures instead (a quoted search, the sweep's own hit count) where it cannot name a reason. Then it
-*conditions* — a globally known album title is worn by thousands, but worn by someone who is also
-Korean and also works in IT security it is worn by a handful — and checks that the axes it is
-multiplying came from **different tool results**, since one profile copied wholesale yields a handle,
-a display name, an avatar and a bio in a single act, and an impersonator yields them the same way.
+`corroborate` asks for one estimate: **if these were two unrelated people, how likely is everything
+you are looking at?** The agent judges the crowd behind each attribute, names what the judgement rests
+on so the analyst can dispute it, and measures instead (a quoted search, the sweep's own hit count)
+where it cannot name a reason. It multiplies only axes that came from **different tool results**, since
+one copied profile yields a handle, display name, avatar and bio in a single act.
 
 A narrow population buys evidence edges, budget, and a stronger sentence in the report. It does not
-buy a same-person edge: that still takes a tool result naming both endpoints together, which is the
-agent's own rule and not this pack's to relax. Counting survives only as the stated fallback for when
-the population can be neither judged nor measured.
+buy a same-person edge: that still takes a tool result naming both endpoints together. Counting is
+only the fallback for when the population can be neither judged nor measured.
 
 ## Layout
 
