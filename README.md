@@ -5,7 +5,7 @@ The **Account & identity pivoting** Skill Pack for Vineyard: a text investigatio
 | Field | Value |
 | --- | --- |
 | Identifier | `run.vineyard.skillpacks.account_identity_pivot` |
-| Version | `3.2.0` |
+| Version | `3.3.0` |
 | Applies to | `identity.handle`, `identity.account`, `identity.email_address`, `identity.person` |
 | Requires | `run.vineyard.pluginpacks.whatsmyname` |
 
